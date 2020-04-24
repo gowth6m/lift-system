@@ -5,188 +5,251 @@
  */
 package liftsystem.UI;
 
-import java.awt.Color;
+import liftsystem.Building;
+import liftsystem.MechanicalLift;
+import liftsystem.SimulationTable;
+import liftsystem.SimulationTable.Table;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingWorker;
-import javax.swing.Timer;
-import liftsystem.Building;
-import liftsystem.MechanicalLift;
-import liftsystem.Person;
-import liftsystem.SimulationTable;
-import liftsystem.SimulationTable.Table;
 
 public class SimulationUI extends javax.swing.JFrame {
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6891848798529338493L;
     private int numberOfFloors;
+    private int liftCapacity;
     private Timer timer;
     private boolean startedSimulation;
-    private final int unitTime; 
+    private final int unitTime;
     private SimulationTable simulationTable;
     private Building building;
     private final int numberOfPeopleInBuilding;
     private ArrayList<Table> result;
-    
-    public void setNumberOfFloors(int floors){
+
+    /**
+     * Creates new form SimulationUI i.e the constructor, you can change the
+     * variables here
+     */
+    public SimulationUI() {
+        this.numberOfFloors = 20; // The number of floors the building has
+        this.unitTime = 5000; // The slowest duration it can take in ms for simulation to take place
+        this.numberOfPeopleInBuilding = 10; // The number of people to simulate for
+        this.liftCapacity = 10; // The capacity of the lift
+
+        // Initialize the components on the screen
+        initComponents();
+
+        // DO NOT MODIFY THE VALUES BELOW THIS COMMENT
+        // ----------------------------------------------------//
+        this.startedSimulation = false;
+        this.timer = null;
+
+        // Create timer and add event listener
+        timer = new Timer(unitTime / this.sliderSpeed.getValue(), (ActionEvent e) -> {
+            // Handle updating the UI here
+            updateUI();
+        });
+        // ---------------------------------------------------//
+    }
+
+    public void setNumberOfFloors(int floors) throws Exception {
         floors = Math.abs(floors);
         this.numberOfFloors = floors;
-        
+
         try {
             // Refresh screen
             refresh();
         } catch (Exception ex) {
             Logger.getLogger(SimulationUI.class.getName()).log(Level.SEVERE, null, ex);
+
+            throw ex;
         }
     }
-    
+
+    public void setLiftCapacity(int capacity) {
+        this.liftCapacity = capacity;
+    }
+
+    public int getLiftCapacity() {
+        return this.liftCapacity;
+    }
+
     /**
-     * 
      * @return int the number of floors
      */
-    public int getNumberOfFloors(){
+    public int getNumberOfFloors() {
         return this.numberOfFloors;
     }
-    
+
     // This functiin redraws the floors
     public void refresh() throws Exception {
         // Clear previous floors
         clearFloors();
-        
+
         // Clear the logs
         this.txtSimulationLog.setText("");
-        
+
         // Create new random buildings
-        for(int i = 0; i < this.numberOfFloors; ++i){
-           JPanelBuildingFloor floor = new JPanelBuildingFloor();
-           
-           // Set the floor properties here
-           floor.setVisible(true);
-           floor.setBounds(7, ((i + 1) * 25), 372, 21);
-           floor.setFloor((this.numberOfFloors - i));
-           floor.lblLift.setText("Floor: " + (this.numberOfFloors - i));
-               
-           // Add floor to the panel
-           this.panelBuilding.add(floor);
-           this.panelBuilding.revalidate();
-           this.panelBuilding.repaint();
+        for (int i = 0; i < this.numberOfFloors; ++i) {
+            JPanelBuildingFloor floor = new JPanelBuildingFloor();
+
+            // Set the floor properties here
+            floor.setVisible(true);
+            floor.setBounds(7, ((i + 1) * 25), 372, 21);
+            floor.setFloor((this.numberOfFloors - i));
+            floor.lblLift.setText("Floor: " + (this.numberOfFloors - i));
+
+            // Add floor to the panel
+            this.panelBuilding.add(floor);
+            this.panelBuilding.revalidate();
+            this.panelBuilding.repaint();
         }
     }
-    
+
+    // Overloaded refresh
+    public void refresh(HashMap<Integer, Integer> hash) throws Exception {
+        // Clear previous floors
+        clearFloors();
+
+        // Clear the logs
+        this.txtSimulationLog.setText("");
+
+        // Create new random buildings
+        for (int i = 0; i < this.numberOfFloors; ++i) {
+            JPanelBuildingFloor floor = new JPanelBuildingFloor();
+
+            // Set the floor properties here
+            floor.setVisible(true);
+            floor.setBounds(7, ((i + 1) * 25), 372, 21);
+            floor.setFloor((this.numberOfFloors - i));
+            floor.lblLift.setText("Floor: " + (this.numberOfFloors - i));
+
+            // Check if the people in the building have been set, and set it if it is contained in key
+            if (hash.containsKey(i + 1)) {
+                floor.lblNumberOfPeople.setText("No. Of People: " + hash.get(i + 1));
+            } else {
+                floor.lblNumberOfPeople.setText("No. Of People: 0");
+            }
+
+
+            // Add floor to the panel
+            this.panelBuilding.add(floor);
+            this.panelBuilding.revalidate();
+            this.panelBuilding.repaint();
+
+        }
+    }
+
     /**
      * Clears the floors and create new ones
      */
-    public void clearFloors(){
-         // Clears the floors
-         for(int i = 0; i < this.panelBuilding.getComponentCount(); ++i){
-             try{
-                 this.panelBuilding.getComponent(i).remove(null);
-             }
-             catch(Exception ex){
-                 Logger.getLogger(SimulationUI.class.getName()).log(Level.SEVERE, null, ex);
-             }
-         }
+    public void clearFloors() {
+        // Clears the floors
+        for (Component c : this.panelBuilding.getComponents()) {
+            try {
+                this.panelBuilding.remove(c);
+            } catch (Exception ex) {
+                Logger.getLogger(SimulationUI.class.getName()).log(Level.SEVERE, null, ex);
+
+                throw ex;
+            }
+        }
     }
-    
-    /**
-     * Creates new form SimulationUI
-     */
-    public SimulationUI() {
-        this.numberOfFloors = 20;
-        this.startedSimulation = false;
-        this.timer = null;
-        this.unitTime = 5000;
-        this.numberOfPeopleInBuilding = 20; // Simulate for 10 people
-        
-        initComponents();
-        
-        timer = new Timer(unitTime / this.sliderSpeed.getValue(), (ActionEvent e) -> {
-            // Handle updating the UI here
-            updateUI();
-        });
-    }
-    
+
     // This function updates the UI
     static int timerCount = 0;
-    public void updateUI(){
-        if(timerCount >= this.result.size()){
+
+    public void updateUI() {
+        if (timerCount >= this.result.size()) {
             stopSimulation();
             this.startedSimulation = false;
             this.btnStartOrStopSimulation.setText("Start simulation");
             this.appendToLog("Finished the simulation.... picked " + this.numberOfPeopleInBuilding + " people");
             return;
         }
-       
+
         // Get the details on this time
         int currentFloor = result.get(timerCount).currentFloor;
         int prevFloor = 1;
         Table currentStatistics = result.get(timerCount);
         Table prevStatistics = null;
-        
-        if(timerCount > 0 || prevStatistics != null){
-           prevStatistics =  result.get(timerCount - 1);
-           prevFloor = prevStatistics.currentFloor;
+
+        if (timerCount > 0 || prevStatistics != null) {
+            prevStatistics = result.get(timerCount - 1);
+            prevFloor = prevStatistics.currentFloor;
         }
-            
-        JPanelBuildingFloor floor = (JPanelBuildingFloor) this.panelBuilding.getComponent(this.building.getMaxFloorsInBuilding() - currentFloor);
-               
+
+        JPanelBuildingFloor floor = (JPanelBuildingFloor) this.panelBuilding
+                .getComponent(this.building.getMaxFloorsInBuilding() - currentFloor);
+
         floor.lblLift.setBackground(new Color(30, 243, 76));
         floor.lblLift.setForeground(Color.WHITE);
-        
-        if(prevFloor > 0){
-            floor = (JPanelBuildingFloor) this.panelBuilding.getComponent(this.building.getMaxFloorsInBuilding() - prevFloor);
-            
-            floor.lblLift.setBackground(new Color(216,216,216));
+        floor.lblNumberOfPeople.setText("No. Of People: " + currentStatistics.numberOfPeopleOnTheCurrentFloor);
+
+        if (prevFloor > 0) {
+            floor = (JPanelBuildingFloor) this.panelBuilding
+                    .getComponent(this.building.getMaxFloorsInBuilding() - prevFloor);
+
+            floor.lblLift.setBackground(new Color(216, 216, 216));
             floor.lblLift.setForeground(Color.WHITE);
         }
-        
+
         this.appendToLog("Currently on floor: " + currentFloor);
+        this.appendToLog("\t Number of people picked up on this floor: " + currentStatistics.numberOfPeoplePickedUp, "additional");
+        this.appendToLog("\t Number of people remaining on this floor: " + currentStatistics.numberOfPeopleOnTheCurrentFloor + "\n\n", "additional");
+
         this.lblCumulativeWaitTime.setText("Cumulative wait time: " + currentStatistics.currentWaitTime);
-        this.lblCumulativeCost.setText("Cumulative cost: " + currentStatistics.currentWaitTime);
+        this.lblCumulativeCost.setText("Cumulative cost: " + currentStatistics.currentCumulativeCost);
         this.lblCurrentFloor.setText("Current Floor: " + currentStatistics.currentFloor);
         this.lblNextFloor.setText("Next Floor: " + currentStatistics.nextFloor);
-        
+
         // Update for lift directions
-        if(currentStatistics.currentLiftDirection){
+        if (currentStatistics.currentLiftDirection) {
             // Lift is going up
             this.lblLiftDirections_UP.setBackground(new Color(30, 243, 76));
             this.lblLiftDirections_UP.setForeground(Color.WHITE);
-            
-            this.lblLiftDirections_DOWN.setBackground(new Color(216,216,216));
+
+            this.lblLiftDirections_DOWN.setBackground(new Color(216, 216, 216));
             this.lblLiftDirections_DOWN.setForeground(Color.BLACK);
-        }
-        else{
+        } else {
             // Lift is going down
-            this.lblLiftDirections_UP.setBackground(new Color(216,216,216));
+            this.lblLiftDirections_UP.setBackground(new Color(216, 216, 216));
             this.lblLiftDirections_UP.setForeground(Color.BLACK);
-            
+
             this.lblLiftDirections_DOWN.setBackground(new Color(30, 243, 76));
             this.lblLiftDirections_DOWN.setForeground(Color.WHITE);
         }
-       
+
         this.lblPeopleInLift.setText("People in lift: " + currentStatistics.numberOfPeopleInTheLift);
         this.lblAlreadyPicked.setText("Already Picked: " + currentStatistics.peopleAlreadyServed);
-        this.lblRemainingPeople.setText("waitingToBePicked: " + currentStatistics.waitingToBePicked);
-        
+        this.lblRemainingPeople.setText("Remaining: " + currentStatistics.waitingToBePicked);
+
         // Upate timer count
         ++timerCount;
-        
+
         // Set the current time
         this.lblSimulationTime.setText("Current time: " + timerCount);
-        
+
         // Update progress bar
-        this.progressBarStatus.setValue((int) (((double)timerCount / this.result.size()) * 100));
-        
+        this.progressBarStatus.setValue((int) (((double) timerCount / this.result.size()) * 100));
+
     }
-   
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         panelBuilding = new javax.swing.JPanel();
@@ -220,18 +283,15 @@ public class SimulationUI extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(800, 720));
         setType(java.awt.Window.Type.POPUP);
 
-        panelBuilding.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 4, true), "Building"));
+        panelBuilding.setBorder(javax.swing.BorderFactory.createTitledBorder(
+                new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 4, true), "Building"));
 
         javax.swing.GroupLayout panelBuildingLayout = new javax.swing.GroupLayout(panelBuilding);
         panelBuilding.setLayout(panelBuildingLayout);
-        panelBuildingLayout.setHorizontalGroup(
-            panelBuildingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 376, Short.MAX_VALUE)
-        );
-        panelBuildingLayout.setVerticalGroup(
-            panelBuildingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
+        panelBuildingLayout.setHorizontalGroup(panelBuildingLayout
+                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 376, Short.MAX_VALUE));
+        panelBuildingLayout.setVerticalGroup(panelBuildingLayout
+                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGap(0, 0, Short.MAX_VALUE));
 
         panelControls.setBorder(javax.swing.BorderFactory.createTitledBorder("Controls"));
 
@@ -264,33 +324,33 @@ public class SimulationUI extends javax.swing.JFrame {
         javax.swing.GroupLayout panelControlsLayout = new javax.swing.GroupLayout(panelControls);
         panelControls.setLayout(panelControlsLayout);
         panelControlsLayout.setHorizontalGroup(
-            panelControlsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelControlsLayout.createSequentialGroup()
-                .addGroup(panelControlsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(panelControlsLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(progressBarStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 374, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(panelControlsLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(sliderSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addGap(11, 11, 11)
-                        .addComponent(lblSimulationSpeed)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnStartOrStopSimulation)))
-                .addContainerGap())
+                panelControlsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panelControlsLayout.createSequentialGroup()
+                                .addGroup(panelControlsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(panelControlsLayout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(progressBarStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 374, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addGroup(panelControlsLayout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(sliderSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                                .addGap(11, 11, 11)
+                                                .addComponent(lblSimulationSpeed)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnStartOrStopSimulation)))
+                                .addContainerGap())
         );
         panelControlsLayout.setVerticalGroup(
-            panelControlsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelControlsLayout.createSequentialGroup()
-                .addContainerGap(18, Short.MAX_VALUE)
-                .addGroup(panelControlsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnStartOrStopSimulation)
-                    .addComponent(sliderSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblSimulationSpeed))
-                .addGap(18, 18, 18)
-                .addComponent(progressBarStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                panelControlsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panelControlsLayout.createSequentialGroup()
+                                .addContainerGap(18, Short.MAX_VALUE)
+                                .addGroup(panelControlsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(btnStartOrStopSimulation)
+                                        .addComponent(sliderSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblSimulationSpeed))
+                                .addGap(18, 18, 18)
+                                .addComponent(progressBarStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
 
         panelStatistics.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 1, true), "Stats"));
@@ -325,72 +385,72 @@ public class SimulationUI extends javax.swing.JFrame {
 
         lblAlreadyPicked.setText("Already Picked: 0");
 
-        lblRemainingPeople.setText("Already Picked: 0");
+        lblRemainingPeople.setText("Remaining: 0");
 
         javax.swing.GroupLayout panelStatisticsLayout = new javax.swing.GroupLayout(panelStatistics);
         panelStatistics.setLayout(panelStatisticsLayout);
         panelStatisticsLayout.setHorizontalGroup(
-            panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelStatisticsLayout.createSequentialGroup()
-                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelStatisticsLayout.createSequentialGroup()
-                        .addGap(17, 17, 17)
-                        .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblCumulativeWaitTime)
-                            .addGroup(panelStatisticsLayout.createSequentialGroup()
-                                .addGap(6, 6, 6)
+                panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panelStatisticsLayout.createSequentialGroup()
                                 .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblSimulationTime)
-                                    .addComponent(lblCurrentFloor))))
-                        .addGap(50, 50, 50)
-                        .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblCumulativeCost)
-                            .addGroup(panelStatisticsLayout.createSequentialGroup()
-                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lblLiftDirections_UP)
-                                    .addComponent(jLabel4))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblLiftDirections_DOWN))))
-                    .addGroup(panelStatisticsLayout.createSequentialGroup()
-                        .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelStatisticsLayout.createSequentialGroup()
-                                .addGap(150, 150, 150)
-                                .addComponent(lblNextFloor)
-                                .addGap(18, 18, 18))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelStatisticsLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(lblRemainingPeople)
-                                .addGap(62, 62, 62)))
-                        .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblAlreadyPicked)
-                            .addComponent(lblPeopleInLift))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(panelStatisticsLayout.createSequentialGroup()
+                                                .addGap(17, 17, 17)
+                                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(lblCumulativeWaitTime)
+                                                        .addGroup(panelStatisticsLayout.createSequentialGroup()
+                                                                .addGap(6, 6, 6)
+                                                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(lblSimulationTime)
+                                                                        .addComponent(lblCurrentFloor))))
+                                                .addGap(50, 50, 50)
+                                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(lblCumulativeCost)
+                                                        .addGroup(panelStatisticsLayout.createSequentialGroup()
+                                                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                        .addComponent(lblLiftDirections_UP)
+                                                                        .addComponent(jLabel4))
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(lblLiftDirections_DOWN))))
+                                        .addGroup(panelStatisticsLayout.createSequentialGroup()
+                                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(panelStatisticsLayout.createSequentialGroup()
+                                                                .addGap(150, 150, 150)
+                                                                .addComponent(lblNextFloor)
+                                                                .addGap(18, 18, 18))
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelStatisticsLayout.createSequentialGroup()
+                                                                .addContainerGap()
+                                                                .addComponent(lblRemainingPeople)
+                                                                .addGap(62, 62, 62)))
+                                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(lblAlreadyPicked)
+                                                        .addComponent(lblPeopleInLift))))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelStatisticsLayout.setVerticalGroup(
-            panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelStatisticsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblCumulativeWaitTime)
-                    .addComponent(lblCumulativeCost))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblSimulationTime)
-                    .addComponent(jLabel4))
-                .addGap(3, 3, 3)
-                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblLiftDirections_UP)
-                    .addComponent(lblLiftDirections_DOWN))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblCurrentFloor)
-                    .addComponent(lblNextFloor)
-                    .addComponent(lblPeopleInLift))
-                .addGap(12, 12, 12)
-                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblAlreadyPicked)
-                    .addComponent(lblRemainingPeople))
-                .addGap(34, 34, 34))
+                panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panelStatisticsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblCumulativeWaitTime)
+                                        .addComponent(lblCumulativeCost))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblSimulationTime)
+                                        .addComponent(jLabel4))
+                                .addGap(3, 3, 3)
+                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblLiftDirections_UP)
+                                        .addComponent(lblLiftDirections_DOWN))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblCurrentFloor)
+                                        .addComponent(lblNextFloor)
+                                        .addComponent(lblPeopleInLift))
+                                .addGap(12, 12, 12)
+                                .addGroup(panelStatisticsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblAlreadyPicked)
+                                        .addComponent(lblRemainingPeople))
+                                .addGap(34, 34, 34))
         );
 
         txtSimulationLog.setEditable(false);
@@ -400,31 +460,31 @@ public class SimulationUI extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(panelBuilding, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelControls, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelStatistics, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jScrollPane2)))
-                .addGap(16, 16, 16))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(panelBuilding, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(panelControls, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(panelStatistics, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(6, 6, 6)
+                                                .addComponent(jScrollPane2)))
+                                .addGap(16, 16, 16))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(panelControls, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(panelStatistics, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE))
-                    .addComponent(panelBuilding, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(panelControls, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(panelStatistics, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE))
+                                        .addComponent(panelBuilding, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
 
         pack();
@@ -434,159 +494,166 @@ public class SimulationUI extends javax.swing.JFrame {
 
         this.lblSimulationSpeed.setText("Simulation speed: " + String.valueOf(this.sliderSpeed.getValue()));
     }//GEN-LAST:event_sliderSpeedStateChanged
-    
-    private void startSimulation(){
+
+    private void startSimulation() throws Exception {
         this.startedSimulation = true;
         this.progressBarStatus.setValue(0);
         this.btnStartOrStopSimulation.setText("Stop simulation");
         this.appendToLog("Running simulation");
         this.txtSimulationLog.setText("");
-        
+
         // Create a new worker thread
         SwingWorker<Integer, Void> worker;
-                    
-        if(this.building == null || this.simulationTable == null){
+
+        if (this.building == null || this.simulationTable == null) {
             // Instantiate a building
             this.building = new Building(this.numberOfFloors);
-            
-            // Generate the simulation table, run this in a separate thread            
+
+            // Generate the simulation table, run this in a separate thread
             // Here you can separate the different Lift algorithms, but for now since
             // we are only using the mechanical lift algorithm, that is what we will use
             this.simulationTable = new SimulationTable(
-                    this.building, 
-                    new MechanicalLift(), 
+                    this.building,
+                    new MechanicalLift(),
                     this.numberOfPeopleInBuilding
-            );
-            
-//            // Fill in the number of people on each floor
-//            HashMap<Integer, Integer> hash = new HashMap<>();
-//            
-//            for(int i = 0; i < this.building.getNumberOfPeopleWaitingToBePicked(); ++i){
-//                Person person = this.building.getPeopleWaitingToBePicked().get(i);
-//                
-//                if(hash.containsKey(person.getCurrentFloor())){
-//                    hash.put(person.getCurrentFloor(), hash.get(person.getCurrentFloor()) + 1);
-//                }
-//                else{
-//                    hash.put(person.getCurrentFloor(), 1);
-//                }
-//            }
-//            
-//            // Loop to add to building
-//            // Clears the floors
-//            for(int i = this.panelBuilding.getComponentCount(); i > 0; --i){
-//                try{
-//                    JPanelBuildingFloor floor = (JPanelBuildingFloor) this.panelBuilding.getComponent(i - 1);
-//
-//                    if(hash.containsKey(i)){
-//                         floor.lblNumberOfPeople.setText("No. Of People: " + hash.get(i));
-//                    }
-//                    else{
-//                        floor.lblNumberOfPeople.setText("No. Of People: " + 0);
-//                    }
-//                    
-//                    floor.revalidate();
-//                }
-//                catch(Exception ex){
-//                    Logger.getLogger(SimulationUI.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//            }
-         
-            
+            ).setLiftCapacity(this.liftCapacity);
+
             // Run the simulation
             // Reset the floors
             try {
-                this.refresh();
+                // Refresh the panels with the people number of people set in their respective
+                // floors
+                this.refresh(this.simulationTable.GetGeneratedPeopleList());
             } catch (Exception ex) {
                 Logger.getLogger(SimulationUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            // The simulation starts here
-            btnStartOrStopSimulation.setEnabled(false);
-            writeToLog("Started simulation");
-            appendToLog("Generating simulation table for " + numberOfPeopleInBuilding + " people");
-                    
-           // Run the simulation in a separate thread
-            worker = new SwingWorker<Integer, Void>() {
-                @Override
-                public Integer doInBackground() {
-                    result = simulationTable.run();
-                    return 1;
-                }
-                
-                @Override
-                public void done() {
-                    btnStartOrStopSimulation.setEnabled(true);
-                    appendToLog("Finished generating table");
-                    appendToLog("Lift has capacity of " + building.getLift().getCapacity());
-                    
-                    timer.setDelay((int) unitTime / sliderSpeed.getValue());
-                    timer.start();
-                }
-            };
 
-            // Call the SwingWorker from within the Swing thread
-            worker.execute();
+                throw ex;
+            }
+        } else {
+            this.simulationTable = simulationTable.restartSimulation();
         }
-        else{
-            // Run the simulation in a separate thread
-            worker = new SwingWorker<Integer, Void>() {
-                @Override
-                public Integer doInBackground() {            
-                    // Just restart the simulation
-                    result = simulationTable.restartSimulation().run();
-                    return 1;
-                }
-                
-                @Override
-                public void done() {
-                    btnStartOrStopSimulation.setEnabled(true);
-                    appendToLog("Finished generating table");
-                    appendToLog("Lift has capacity of " + building.getLift().getCapacity());
-                    
-                    timer.setDelay((int) unitTime / sliderSpeed.getValue());
-                    timer.start();
-                }
-            };
-            
-            // Call the SwingWorker from within the Swing thread
-            worker.execute();
+
+        // The simulation starts here
+        btnStartOrStopSimulation.setEnabled(false);
+        writeToLog("Started simulation");
+        appendToLog("Generating simulation table for " + numberOfPeopleInBuilding + " people");
+
+        // Run the simulation
+        // Reset the floors
+        try {
+            // Refresh the panels with the people number of people set in their respective
+            // floors
+            this.refresh(this.simulationTable.GetGeneratedPeopleList());
+        } catch (Exception ex) {
+            Logger.getLogger(SimulationUI.class.getName()).log(Level.SEVERE, null, ex);
+
+            throw ex;
         }
+
+        // Run the simulation in a separate thread
+        worker = new SwingWorker<Integer, Void>() {
+            @Override
+            public Integer doInBackground() {
+                // Just restart the simulation
+
+                result = simulationTable.run();
+                return 1;
+            }
+
+            @Override
+            public void done() {
+                btnStartOrStopSimulation.setEnabled(true);
+                appendToLog("Finished generating table");
+                appendToLog("Lift has capacity of " + building.getLift().getCapacity());
+
+                timer.setDelay((int) unitTime / sliderSpeed.getValue());
+                timer.start();
+            }
+        };
+
+        // Call the SwingWorker from within the Swing thread
+        worker.execute();
 
         //[30,243,76] - Selected
         //[214,217,223] - Not selected
     }
-    
-    private void appendToLog(String text){
-        txtSimulationLog.setText(txtSimulationLog.getText() + "[*] " + text  + "\n" );
+
+    public void appendToLog(String text) {
+        appendToLog(text, "infor");
     }
-    
-    private void writeToLog(String text){
-         txtSimulationLog.setText("[*] " + text + "\n");
+
+    public void appendToLog(String text, String type) {
+        switch (type.toLowerCase()) {
+            case "error":
+                txtSimulationLog.setForeground(Color.PINK);
+                break;
+
+            case "warning":
+                txtSimulationLog.setForeground(Color.ORANGE);
+                break;
+
+            case "additional":
+                txtSimulationLog.setForeground(Color.DARK_GRAY);
+                break;
+
+            default:
+                txtSimulationLog.setForeground(Color.BLACK);
+                break;
+        }
+
+        txtSimulationLog.setText(txtSimulationLog.getText() + "[*] " + text + "\n");
     }
-    
-    private void stopSimulation(){
+
+    public void writeToLog(String text) {
+        writeToLog(text, "info");
+    }
+
+    public void writeToLog(String text, String type) {
+        switch (type.toLowerCase()) {
+            case "error":
+                txtSimulationLog.setForeground(Color.PINK);
+                break;
+
+            case "warning":
+                txtSimulationLog.setForeground(Color.ORANGE);
+                break;
+
+            case "additional":
+                txtSimulationLog.setForeground(Color.DARK_GRAY);
+                break;
+
+            default:
+                txtSimulationLog.setForeground(Color.BLACK);
+                break;
+        }
+
+        txtSimulationLog.setText("[*] " + text + "\n");
+    }
+
+    private void stopSimulation() {
         timer.stop();
         this.startedSimulation = false;
         this.btnStartOrStopSimulation.setText("Start simulation");
         this.appendToLog("Simulation stopped");
         timerCount = 0;
     }
-    
-    private void btnStartOrStopSimulationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartOrStopSimulationActionPerformed
-        // TODO add your handling code here:
-        if(startedSimulation){
+
+    private void btnStartOrStopSimulationActionPerformed(java.awt.event.ActionEvent evt) {
+        //GEN-FIRST:event_btnStartOrStopSimulationActionPerformed
+        if (startedSimulation) {
             stopSimulation();
-        }
-        else{
-           startSimulation();
+        } else {
+            try {
+                startSimulation();
+            } catch (Exception e) {
+                this.writeToLog("Error occured\n" + e.getStackTrace(), "error");
+            }
         }
     }//GEN-LAST:event_btnStartOrStopSimulationActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnStartOrStopSimulation;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblAlreadyPicked;
     private javax.swing.JLabel lblCumulativeCost;
