@@ -15,15 +15,21 @@ public class Main {
         SimulationUI n = new SimulationUI();
 
         try {
-            // Set the number of floors the building has
+            ImprovedLift iLift = new ImprovedLift();
+            MechanicalLift mLift = new MechanicalLift();
+            // Set the number of floors the building
             n.setNumberOfFloors(20);
+            // Set the number of people in the building
+            n.setNumberOfPeopleInBuilding(10);
+            // Set the between iLift for Improved Lift or mLift for Mechanical Lift.
+            n.setLiftAlgorithm(mLift);
 
             // Show the simulation form 
             n.setVisible(true);
         } catch (Exception e) {
             Logger.getLogger(SimulationUI.class.getName()).log(Level.SEVERE, null, e);
 
-            n.writeToLog("Ab error occured: " + e.getMessage(), "error");
+            n.writeToLog("An error occurred: " + e.getMessage(), "error");
         }
 
     }

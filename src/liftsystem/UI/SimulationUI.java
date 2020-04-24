@@ -5,9 +5,7 @@
  */
 package liftsystem.UI;
 
-import liftsystem.Building;
-import liftsystem.MechanicalLift;
-import liftsystem.SimulationTable;
+import liftsystem.*;
 import liftsystem.SimulationTable.Table;
 
 import javax.swing.*;
@@ -30,8 +28,9 @@ public class SimulationUI extends javax.swing.JFrame {
     private final int unitTime;
     private SimulationTable simulationTable;
     private Building building;
-    private final int numberOfPeopleInBuilding;
+    private int numberOfPeopleInBuilding;
     private ArrayList<Table> result;
+    private LiftAlgorithm liftAlgorithm;
 
     /**
      * Creates new form SimulationUI i.e the constructor, you can change the
@@ -46,7 +45,6 @@ public class SimulationUI extends javax.swing.JFrame {
         // Initialize the components on the screen
         initComponents();
 
-        // DO NOT MODIFY THE VALUES BELOW THIS COMMENT
         // ----------------------------------------------------//
         this.startedSimulation = false;
         this.timer = null;
@@ -73,6 +71,11 @@ public class SimulationUI extends javax.swing.JFrame {
         }
     }
 
+    public void setNumberOfPeopleInBuilding(int people) {
+        people = Math.abs(people);
+        this.numberOfPeopleInBuilding = people;
+    }
+
     public void setLiftCapacity(int capacity) {
         this.liftCapacity = capacity;
     }
@@ -88,7 +91,7 @@ public class SimulationUI extends javax.swing.JFrame {
         return this.numberOfFloors;
     }
 
-    // This functiin redraws the floors
+    // This function redraws the floors
     public void refresh() throws Exception {
         // Clear previous floors
         clearFloors();
@@ -132,8 +135,8 @@ public class SimulationUI extends javax.swing.JFrame {
             floor.lblLift.setText("Floor: " + (this.numberOfFloors - i));
 
             // Check if the people in the building have been set, and set it if it is contained in key
-            if (hash.containsKey(i + 1)) {
-                floor.lblNumberOfPeople.setText("No. Of People: " + hash.get(i + 1));
+            if (hash.containsKey(numberOfFloors - i)) {
+                floor.lblNumberOfPeople.setText("No. Of People: " + hash.get(numberOfFloors - i));
             } else {
                 floor.lblNumberOfPeople.setText("No. Of People: 0");
             }
@@ -206,7 +209,7 @@ public class SimulationUI extends javax.swing.JFrame {
         this.appendToLog("\t Number of people remaining on this floor: " + currentStatistics.numberOfPeopleOnTheCurrentFloor + "\n\n", "additional");
 
         this.lblCumulativeWaitTime.setText("Cumulative wait time: " + currentStatistics.currentWaitTime);
-        this.lblCumulativeCost.setText("Cumulative cost: " + currentStatistics.currentCumulativeCost);
+        this.lblCumulativeCost.setText("Cumulative total cost: " + currentStatistics.currentCumulativeCost);
         this.lblCurrentFloor.setText("Current Floor: " + currentStatistics.currentFloor);
         this.lblNextFloor.setText("Next Floor: " + currentStatistics.nextFloor);
 
@@ -228,10 +231,10 @@ public class SimulationUI extends javax.swing.JFrame {
         }
 
         this.lblPeopleInLift.setText("People in lift: " + currentStatistics.numberOfPeopleInTheLift);
-        this.lblAlreadyPicked.setText("Already Picked: " + currentStatistics.peopleAlreadyServed);
-        this.lblRemainingPeople.setText("Remaining: " + currentStatistics.waitingToBePicked);
+        this.lblAlreadyPicked.setText("At Destination: " + currentStatistics.peopleAlreadyServed);
+        this.lblRemainingPeople.setText("Waiting to be picked: " + currentStatistics.waitingToBePicked);
 
-        // Upate timer count
+        // Update timer count
         ++timerCount;
 
         // Set the current time
@@ -357,7 +360,7 @@ public class SimulationUI extends javax.swing.JFrame {
 
         lblCumulativeWaitTime.setText("Cumulative wait time: 0");
 
-        lblCumulativeCost.setText("Cumulative cost: 0");
+        lblCumulativeCost.setText("Cumulative total cost: 0");
 
         lblSimulationTime.setText("Current time: 0");
 
@@ -383,9 +386,9 @@ public class SimulationUI extends javax.swing.JFrame {
 
         lblPeopleInLift.setText("People in lift: 0");
 
-        lblAlreadyPicked.setText("Already Picked: 0");
+        lblAlreadyPicked.setText("At Destination: 0");
 
-        lblRemainingPeople.setText("Remaining: 0");
+        lblRemainingPeople.setText("Waiting to be picked: 0");
 
         javax.swing.GroupLayout panelStatisticsLayout = new javax.swing.GroupLayout(panelStatistics);
         panelStatistics.setLayout(panelStatisticsLayout);
@@ -495,6 +498,10 @@ public class SimulationUI extends javax.swing.JFrame {
         this.lblSimulationSpeed.setText("Simulation speed: " + String.valueOf(this.sliderSpeed.getValue()));
     }//GEN-LAST:event_sliderSpeedStateChanged
 
+    public void setLiftAlgorithm(LiftAlgorithm a) {
+        this.liftAlgorithm = a;
+    }
+
     private void startSimulation() throws Exception {
         this.startedSimulation = true;
         this.progressBarStatus.setValue(0);
@@ -510,19 +517,19 @@ public class SimulationUI extends javax.swing.JFrame {
             this.building = new Building(this.numberOfFloors);
 
             // Generate the simulation table, run this in a separate thread
-            // Here you can separate the different Lift algorithms, but for now since
-            // we are only using the mechanical lift algorithm, that is what we will use
+            // Here you can separate the different Lift algorithms
             this.simulationTable = new SimulationTable(
                     this.building,
-                    new MechanicalLift(),
+//                    new MechanicalLift(),
+//                    new ImprovedLift(),
+                    this.liftAlgorithm,
                     this.numberOfPeopleInBuilding
             ).setLiftCapacity(this.liftCapacity);
 
             // Run the simulation
             // Reset the floors
             try {
-                // Refresh the panels with the people number of people set in their respective
-                // floors
+                // Refresh the panels with the people number of people set in their respective floors
                 this.refresh(this.simulationTable.GetGeneratedPeopleList());
             } catch (Exception ex) {
                 Logger.getLogger(SimulationUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -541,8 +548,7 @@ public class SimulationUI extends javax.swing.JFrame {
         // Run the simulation
         // Reset the floors
         try {
-            // Refresh the panels with the people number of people set in their respective
-            // floors
+            // Refresh the panels with the people number of people set in their respective floors
             this.refresh(this.simulationTable.GetGeneratedPeopleList());
         } catch (Exception ex) {
             Logger.getLogger(SimulationUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -574,8 +580,6 @@ public class SimulationUI extends javax.swing.JFrame {
         // Call the SwingWorker from within the Swing thread
         worker.execute();
 
-        //[30,243,76] - Selected
-        //[214,217,223] - Not selected
     }
 
     public void appendToLog(String text) {
@@ -646,7 +650,7 @@ public class SimulationUI extends javax.swing.JFrame {
             try {
                 startSimulation();
             } catch (Exception e) {
-                this.writeToLog("Error occured\n" + e.getStackTrace(), "error");
+                this.writeToLog("Error occurred\n" + e.getStackTrace(), "error");
             }
         }
     }//GEN-LAST:event_btnStartOrStopSimulationActionPerformed

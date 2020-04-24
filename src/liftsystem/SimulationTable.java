@@ -90,7 +90,7 @@ public class SimulationTable {
 
                 // Update the current number if t < 0
                 currentStats.numberOfPeoplePickedUp = result.getNumberOfPeopleWhoGotInLiftOnThisFloor();
-                currentStats.numberOfPeopleOnTheCurrentFloor = t < 0 ? 0 : t;
+                currentStats.numberOfPeopleOnTheCurrentFloor = Math.max(t, 0);
                 generatedPeople.put(currentStats.currentFloor, currentStats.numberOfPeopleOnTheCurrentFloor);
             } else {
                 // Acts as a failsafe
@@ -146,7 +146,7 @@ public class SimulationTable {
             int initialFloor = generateRandomInt(building.getMinFloorsInBuilding(), building.getMaxFloorsInBuilding());
             p.setInitialFloor(initialFloor);
 
-            // Set the target flooor
+            // Set the target floor
             int targetFloor = generateRandomInt(building.getMinFloorsInBuilding(), building.getMaxFloorsInBuilding());
             p.setTargetFloor(targetFloor);
 
