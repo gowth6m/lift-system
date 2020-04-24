@@ -15,13 +15,15 @@ public class Main {
         SimulationUI n = new SimulationUI();
 
         try {
+            // Initialize both lift algorithm
             ImprovedLift iLift = new ImprovedLift();
             MechanicalLift mLift = new MechanicalLift();
+
             // Set the number of floors the building
             n.setNumberOfFloors(20);
             // Set the number of people in the building
             n.setNumberOfPeopleInBuilding(10);
-            // Set the between iLift for Improved Lift or mLift for Mechanical Lift.
+            // Set the between iLift for Improved Lift or mLift for Mechanical Lift
             n.setLiftAlgorithm(mLift);
 
             // Show the simulation form 
