@@ -44,8 +44,6 @@ public class SimulationUI extends javax.swing.JFrame {
 
         // Initialize the components on the screen
         initComponents();
-
-        // ----------------------------------------------------//
         this.startedSimulation = false;
         this.timer = null;
 
@@ -54,7 +52,6 @@ public class SimulationUI extends javax.swing.JFrame {
             // Handle updating the UI here
             updateUI();
         });
-        // ---------------------------------------------------//
     }
 
     public void setNumberOfFloors(int floors) throws Exception {
@@ -238,10 +235,13 @@ public class SimulationUI extends javax.swing.JFrame {
         ++timerCount;
 
         // Set the current time
-        this.lblSimulationTime.setText("Current time: " + timerCount);
+        this.lblSimulationTime.setText("Travel time: " + timerCount);
 
         // Update progress bar
         this.progressBarStatus.setValue((int) (((double) timerCount / this.result.size()) * 100));
+
+//        System.out.println(currentStatistics.currentWaitTime);
+//        System.out.println(currentStatistics.currentCumulativeCost);
 
     }
 
@@ -362,7 +362,7 @@ public class SimulationUI extends javax.swing.JFrame {
 
         lblCumulativeCost.setText("Cumulative total cost: 0");
 
-        lblSimulationTime.setText("Current time: 0");
+        lblSimulationTime.setText("Travel time: 0");
 
         jLabel4.setText("Lift direction: ");
 
@@ -517,9 +517,9 @@ public class SimulationUI extends javax.swing.JFrame {
             this.building = new Building(this.numberOfFloors);
 
             // Generate the simulation table, run this in a separate thread
-            // Here you can separate the different Lift algorithms
             this.simulationTable = new SimulationTable(
                     this.building,
+                    // Manually choosing lift algorithm
 //                    new MechanicalLift(),
 //                    new ImprovedLift(),
                     this.liftAlgorithm,

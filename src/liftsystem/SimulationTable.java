@@ -17,8 +17,8 @@ public class SimulationTable {
     private HashMap<Integer, Integer> generatedPeople; // Hashmap that maps people in current floor, with the total
     // with their respective number
 
-    public SimulationTable(Building building, LiftAlgorithm LA, int intialNumberOfPeople) {
-        this.intialNumberOfPeople = intialNumberOfPeople;
+    public SimulationTable(Building building, LiftAlgorithm LA, int initialNumberOfPeople) {
+        this.intialNumberOfPeople = initialNumberOfPeople;
         this.random = new Random();
         this.isSimulationOver = false;
         this.building = building;
@@ -33,7 +33,7 @@ public class SimulationTable {
         }
 
         // Simulate for specified number of people
-        if (intialNumberOfPeople > 0) {
+        if (initialNumberOfPeople > 0) {
             simulateFor(this.intialNumberOfPeople);
         }
     }
@@ -122,23 +122,6 @@ public class SimulationTable {
      * @param numberOfPeopleInBuilding - Simulate for specified number of people in the building
      */
     private SimulationTable simulateFor(int numberOfPeopleInBuilding) {
-        //-------------------------------------------//
-        //This is a test case
-        // Person p = new Person(building)
-
-        // The person is initially at floor 6 an wants to go to floor 1
-        // the lift starts at floor 7, so the total cost for delivering this person
-        // will be 33, and the wait time is 27
-        // p.setInitialFloor(6);
-        // p.setTargetFloor(1);
-        // this.building.addPersonWaitingToBePicked(p); // Adds the person to wait list
-
-        // Set the buildings initial floor.This is the floor that the simulation will start in
-        // building.getLift().setCurrentFloor(7);
-
-        // return this;
-        //------------------------------------------//
-
         for (int i = 0; i < numberOfPeopleInBuilding; ++i) {
             Person p = new Person(building);
 
@@ -156,7 +139,6 @@ public class SimulationTable {
                 p.setTargetFloor(targetFloor);
             }
 
-
             // Update the number of people initially on that floor
             if (generatedPeople.containsKey(initialFloor)) {
                 // Update number of people initially on this floor
@@ -173,6 +155,276 @@ public class SimulationTable {
 
         return this;
     }
+
+    // --------------------------------------------------------------------------------------------//
+    // TEST CASE (To compare between the 2 algorithms)
+    // Manually assigning people to the lift
+//    private SimulationTable simulateFor(int numberOfPeopleInBuilding) {
+//        // person 1
+//        Person p1 = new Person(building);
+//        int initialFloor1 = 4;
+//        p1.setInitialFloor(initialFloor1);
+//        p1.setTargetFloor(2);
+//        if (generatedPeople.containsKey(initialFloor1)) {
+//            Integer newVal = generatedPeople.get(initialFloor1) + 1;
+//            generatedPeople.put(initialFloor1, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor1, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p1);
+//
+//        // person 2
+//        Person p2 = new Person(building);
+//        int initialFloor2 = 7;
+//        p2.setInitialFloor(initialFloor2);
+//        p2.setTargetFloor(15);
+//        if (generatedPeople.containsKey(initialFloor2)) {
+//            Integer newVal = generatedPeople.get(initialFloor2) + 1;
+//            generatedPeople.put(initialFloor2, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor2, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p2);
+//
+//        // person 3
+//        Person p3 = new Person(building);
+//        int initialFloor3 = 9;
+//        p3.setInitialFloor(initialFloor3);
+//        p3.setTargetFloor(14);
+//        if (generatedPeople.containsKey(initialFloor3)) {
+//            Integer newVal = generatedPeople.get(initialFloor3) + 1;
+//            generatedPeople.put(initialFloor3, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor3, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p3);
+//
+//        // person 4
+//        Person p4 = new Person(building);
+//        int initialFloor4 = 9;
+//        p4.setInitialFloor(initialFloor4);
+//        p4.setTargetFloor(12);
+//        if (generatedPeople.containsKey(initialFloor4)) {
+//            Integer newVal = generatedPeople.get(initialFloor4) + 1;
+//            generatedPeople.put(initialFloor4, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor4, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p4);
+//
+//        // person 5
+//        Person p5 = new Person(building);
+//        int initialFloor5 = 10;
+//        p5.setInitialFloor(initialFloor5);
+//        p5.setTargetFloor(17);
+//        if (generatedPeople.containsKey(initialFloor5)) {
+//            Integer newVal = generatedPeople.get(initialFloor5) + 1;
+//            generatedPeople.put(initialFloor5, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor5, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p5);
+//
+//        // person 6
+//        Person p6 = new Person(building);
+//        int initialFloor6 = 4;
+//        p6.setInitialFloor(initialFloor6);
+//        p6.setTargetFloor(3);
+//        if (generatedPeople.containsKey(initialFloor6)) {
+//            Integer newVal = generatedPeople.get(initialFloor6) + 1;
+//            generatedPeople.put(initialFloor6, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor6, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p6);
+//
+//        // person 7
+//        Person p7 = new Person(building);
+//        int initialFloor7 = 2;
+//        p7.setInitialFloor(initialFloor7);
+//        p7.setTargetFloor(15);
+//        if (generatedPeople.containsKey(initialFloor7)) {
+//            Integer newVal = generatedPeople.get(initialFloor7) + 1;
+//            generatedPeople.put(initialFloor7, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor7, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p7);
+//
+//        // person 8
+//        Person p8 = new Person(building);
+//        int initialFloor8 = 9;
+//        p8.setInitialFloor(initialFloor8);
+//        p8.setTargetFloor(16);
+//        if (generatedPeople.containsKey(initialFloor8)) {
+//            Integer newVal = generatedPeople.get(initialFloor8) + 1;
+//            generatedPeople.put(initialFloor8, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor8, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p8);
+//
+//        // person 9
+//        Person p9 = new Person(building);
+//        int initialFloor9 = 3;
+//        p9.setInitialFloor(initialFloor9);
+//        p9.setTargetFloor(11);
+//        if (generatedPeople.containsKey(initialFloor9)) {
+//            Integer newVal = generatedPeople.get(initialFloor9) + 1;
+//            generatedPeople.put(initialFloor9, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor9, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p9);
+//
+//        // person 10
+//        Person p10 = new Person(building);
+//        int initialFloor10 = 9;
+//        p10.setInitialFloor(initialFloor10);
+//        p10.setTargetFloor(16);
+//        if (generatedPeople.containsKey(initialFloor10)) {
+//            Integer newVal = generatedPeople.get(initialFloor10) + 1;
+//            generatedPeople.put(initialFloor10, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor10, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p10);
+//
+//        // ---------- //
+//
+//        // person 11
+//        Person p11 = new Person(building);
+//        int initialFloor11 = 3;
+//        p11.setInitialFloor(initialFloor11);
+//        p11.setTargetFloor(8);
+//        if (generatedPeople.containsKey(initialFloor11)) {
+//            Integer newVal = generatedPeople.get(initialFloor11) + 1;
+//            generatedPeople.put(initialFloor11, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor11, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p11);
+//
+//        // person 12
+//        Person p12 = new Person(building);
+//        int initialFloor12 = 7;
+//        p12.setInitialFloor(initialFloor2);
+//        p12.setTargetFloor(13);
+//        if (generatedPeople.containsKey(initialFloor12)) {
+//            Integer newVal = generatedPeople.get(initialFloor12) + 1;
+//            generatedPeople.put(initialFloor12, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor12, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p12);
+//
+//        // person 13
+//        Person p13 = new Person(building);
+//        int initialFloor13 = 9;
+//        p13.setInitialFloor(initialFloor13);
+//        p13.setTargetFloor(16);
+//        if (generatedPeople.containsKey(initialFloor13)) {
+//            Integer newVal = generatedPeople.get(initialFloor13) + 1;
+//            generatedPeople.put(initialFloor13, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor13, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p13);
+//
+//        // person 4
+//        Person p14 = new Person(building);
+//        int initialFloor14 = 4;
+//        p14.setInitialFloor(initialFloor4);
+//        p14.setTargetFloor(12);
+//        if (generatedPeople.containsKey(initialFloor14)) {
+//            Integer newVal = generatedPeople.get(initialFloor14) + 1;
+//            generatedPeople.put(initialFloor14, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor4, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p14);
+//
+//        // person 15
+//        Person p15 = new Person(building);
+//        int initialFloor15 = 10;
+//        p15.setInitialFloor(initialFloor15);
+//        p15.setTargetFloor(17);
+//        if (generatedPeople.containsKey(initialFloor15)) {
+//            Integer newVal = generatedPeople.get(initialFloor15) + 1;
+//            generatedPeople.put(initialFloor15, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor15, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p15);
+//
+//        // person 16
+//        Person p16 = new Person(building);
+//        int initialFloor16 = 4;
+//        p16.setInitialFloor(initialFloor16);
+//        p16.setTargetFloor(5);
+//        if (generatedPeople.containsKey(initialFloor16)) {
+//            Integer newVal = generatedPeople.get(initialFloor16) + 1;
+//            generatedPeople.put(initialFloor16, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor16, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p16);
+//
+//        // person 17
+//        Person p17 = new Person(building);
+//        int initialFloor17 = 2;
+//        p17.setInitialFloor(initialFloor17);
+//        p17.setTargetFloor(18);
+//        if (generatedPeople.containsKey(initialFloor17)) {
+//            Integer newVal = generatedPeople.get(initialFloor17) + 1;
+//            generatedPeople.put(initialFloor17, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor17, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p17);
+//
+//        // person 8
+//        Person p18 = new Person(building);
+//        int initialFloor18 = 9;
+//        p18.setInitialFloor(initialFloor18);
+//        p18.setTargetFloor(20);
+//        if (generatedPeople.containsKey(initialFloor18)) {
+//            Integer newVal = generatedPeople.get(initialFloor18) + 1;
+//            generatedPeople.put(initialFloor18, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor18, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p18);
+//
+//        // person 19
+//        Person p19 = new Person(building);
+//        int initialFloor19 = 3;
+//        p19.setInitialFloor(initialFloor19);
+//        p19.setTargetFloor(11);
+//        if (generatedPeople.containsKey(initialFloor19)) {
+//            Integer newVal = generatedPeople.get(initialFloor19) + 1;
+//            generatedPeople.put(initialFloor19, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor19, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p19);
+//
+//        // person 20
+//        Person p20 = new Person(building);
+//        int initialFloor20 = 6;
+//        p20.setInitialFloor(initialFloor20);
+//        p20.setTargetFloor(19);
+//        if (generatedPeople.containsKey(initialFloor20)) {
+//            Integer newVal = generatedPeople.get(initialFloor20) + 1;
+//            generatedPeople.put(initialFloor20, newVal);
+//        } else {
+//            generatedPeople.put(initialFloor20, 1);
+//        }
+//        this.building.addPersonWaitingToBePicked(p20);
+//
+//        return this;
+//    }
+    // --------------------------------------------------------------------------------------------//
 
     /**
      * Gets the generated list of people each with their respective number
@@ -197,7 +449,6 @@ public class SimulationTable {
     /**
      * This is the actual simulation table
      * Every member of this class is public and it does not have methods.
-     * This is a dirty way of creating a structure/struct
      */
     public class Table {
         public int currentFloor;

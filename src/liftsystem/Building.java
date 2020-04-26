@@ -7,9 +7,6 @@ package liftsystem;
 
 import java.util.ArrayList;
 
-/**
- * @author Grimm
- */
 public final class Building {
     private final int minFloor;
     private int maxFloor;

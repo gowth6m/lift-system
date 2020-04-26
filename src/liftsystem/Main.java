@@ -20,9 +20,10 @@ public class Main {
             MechanicalLift mLift = new MechanicalLift();
 
             // Set the number of floors the building
+            n.setLiftCapacity(5);
             n.setNumberOfFloors(20);
             // Set the number of people in the building
-            n.setNumberOfPeopleInBuilding(10);
+            n.setNumberOfPeopleInBuilding(20);
             // Set the between iLift for Improved Lift or mLift for Mechanical Lift
             n.setLiftAlgorithm(mLift);
 

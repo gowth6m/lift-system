@@ -8,7 +8,7 @@ package liftsystem;
 import java.util.ArrayList;
 
 /**
- * An abstract class that provides a boilerplate for lift algorithms
+ * An abstract class for lift algorithms
  */
 public abstract class LiftAlgorithm {
     protected int counter;
@@ -41,7 +41,7 @@ public abstract class LiftAlgorithm {
     }
 
     /**
-     * Must be overidden this is where the lift logic comes in
+     * Must be overridden this is where the lift logic comes in
      *
      * @return LiftAlgorithm being used from extended subclass
      */

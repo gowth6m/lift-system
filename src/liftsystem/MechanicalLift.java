@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public final class MechanicalLift extends LiftAlgorithm {
 
     public MechanicalLift() {
-        // Call the super class constructor, must always be called to intitialize the class
+        // Call the super class constructor, must always be called to initialize the class
         super();
     }
 
@@ -26,18 +26,18 @@ public final class MechanicalLift extends LiftAlgorithm {
         // Update the counter
         this.counter++;
 
-        // Return this class at its current state, so that it can be logged by the
-        // SimulationTable class
+        // Return this class at its current state, so that it can be logged by the SimulationTable class
         return this;
     }
 
     private void checkReachedDestination() {
-        // Temporarily stores a list of persons to be removed from the lift list, this is to prevent errors such as null
-        // exception and to ensure the programs runs correctly
+        // Temporarily stores a list of persons to be removed from the lift list, this is to prevent errors such as null exception and to ensure the programs runs correctly
         ArrayList<Person> toBeRemoved = new ArrayList<>();
 
         // Check if there is a person waiting to get off the lift on the current floor
         for (Person personInLift : building.getPeopleInLift()) {
+//            System.out.println("Target floor: " + personInLift.getTargetFloor());
+//            System.out.println(this.getCurrentFloor());
 
             // Check if the person is getting out at this point
             if (personInLift.getTargetFloor() == this.getCurrentFloor()) {
@@ -70,10 +70,10 @@ public final class MechanicalLift extends LiftAlgorithm {
         ArrayList<Person> toBeRemoved = new ArrayList<>();
 
         for (Person personWaiting : this.building.getPeopleWaitingToBePicked()) {
-            // Search for all people that are on the current floor
+            // Search for all people that are on current floor
             // Person personWaiting = this.building.getPeopleWaitingToBePicked().get(j);
 
-            // If the persom is waiting to be picked up
+            // If the person is waiting to be picked up
             if (personWaiting.getInitialFloor() == this.getCurrentFloor()) {
                 // Check to see if the persons target floor is equal to current floor
                 if (personWaiting.getTargetFloor() == personWaiting.getInitialFloor()) {
@@ -82,7 +82,8 @@ public final class MechanicalLift extends LiftAlgorithm {
 
                     // Update the persons on this floor list
                     ++peopleOnThisFloor;
-                } else {
+                }
+                else {
                     // Check if the elevator is full
                     if (!this.isFull()) {
                         // The lift is not full add the person
@@ -95,7 +96,8 @@ public final class MechanicalLift extends LiftAlgorithm {
                         personWaiting.setWaitTime(personWaiting.getWaitTime() + 1);
                     }
                 }
-            } else {
+            }
+            else {
                 // Increment the waiting time for this person
                 personWaiting.setWaitTime(personWaiting.getWaitTime() + 1);
             }

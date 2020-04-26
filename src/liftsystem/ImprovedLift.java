@@ -18,6 +18,16 @@ public final class ImprovedLift extends LiftAlgorithm {
         // This function checks if anyone is waiting to enter the lift on the current floor
         checkWaiting();
 
+        for (Person personInLift : building.getPeopleInLift()) {
+            // This is to change direction if there are no more targets to be picked up or deliver
+            if (this.building.getPeopleWaitingToBePicked().isEmpty() && personInLift.getTargetFloor() < this.getCurrentFloor()) {
+                this.liftDirection = false;
+            }
+            if (this.building.getPeopleWaitingToBePicked().isEmpty() && personInLift.getTargetFloor() > this.getCurrentFloor()) {
+                this.liftDirection = true;
+            }
+        }
+
         // Update the counter
         this.counter++;
 
@@ -68,7 +78,7 @@ public final class ImprovedLift extends LiftAlgorithm {
             // Search for all people that are on the current floor
             // Person personWaiting = this.building.getPeopleWaitingToBePicked().get(j);
 
-            // If the persom is waiting to be picked up
+            // If the person is waiting to be picked up
             if (personWaiting.getInitialFloor() == this.getCurrentFloor()) {
                 // Check to see if the persons target floor is equal to current floor
                 if (personWaiting.getTargetFloor() == personWaiting.getInitialFloor()) {
